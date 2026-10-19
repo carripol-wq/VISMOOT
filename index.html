@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>BOS v. Nautilus – Línea temporal</title>
+<style>
+:root{--bg:#f6f5f1;--card:#fff;--tx:#1d2733;--mut:#667085;--line:#cfd4dc;--acc:#1f5fa8;
+--c1:#1f5fa8;--c2:#b4690e;--c3:#b3261e;--c4:#2e7d4f;
+box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#14181d;--card:#1e242b;--tx:#e8ebef;--mut:#9aa4b2;--line:#3a434e;--acc:#6aa9ee;--c1:#6aa9ee;--c2:#e6a04a;--c3:#f0837b;--c4:#6cc795}}
+:root[data-theme="dark"]{--bg:#14181d;--card:#1e242b;--tx:#e8ebef;--mut:#9aa4b2;--line:#3a434e;--acc:#6aa9ee;--c1:#6aa9ee;--c2:#e6a04a;--c3:#f0837b;--c4:#6cc795}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--tx);font:16px/1.5 system-ui,-apple-system,"Segoe UI",sans-serif}
+header{padding:18px 16px 8px;max-width:760px;margin:0 auto}
+h1{font-size:20px;margin:0 0 2px}
+header p{margin:0;color:var(--mut);font-size:14px}
+nav{position:sticky;top:env(safe-area-inset-top,0px);background:var(--bg);z-index:5;padding:8px 16px;max-width:760px;margin:0 auto}
+.tabs{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+.tab,.chip{border:1px solid var(--line);background:var(--card);color:var(--tx);border-radius:999px;padding:6px 12px;font-size:14px;white-space:nowrap;cursor:pointer}
+.tab.on{background:var(--acc);color:#fff;border-color:var(--acc)}
+.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:4px}
+.chip{font-size:13px;padding:4px 10px}
+.chip.off{opacity:.4}
+.chip i,.dot{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:5px}
+main{max-width:760px;margin:0 auto;padding:8px 16px 40px}
+.tl{position:relative;margin-left:8px;border-left:2px solid var(--line);padding-left:18px}
+.ev{position:relative;margin:0 0 12px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;cursor:pointer}
+.ev:before{content:"";position:absolute;left:-27px;top:16px;width:12px;height:12px;border-radius:50%;background:var(--c);border:2px solid var(--bg)}
+.ev .d{font-size:12px;font-weight:600;color:var(--c);text-transform:uppercase;letter-spacing:.03em}
+.ev .t{font-weight:600}
+.ev .x{display:none;margin-top:6px;color:var(--mut);font-size:14px}
+.ev.open .x{display:block}
+.ev.open{border-color:var(--c)}
+.hint{color:var(--mut);font-size:13px;margin:6px 0 12px}
+.pc{background:var(--card);border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:10px}
+.pc b{display:block}.pc span{color:var(--mut);font-size:14px}
+ol.is{padding-left:20px}ol.is li{margin-bottom:8px}
+.note{font-size:13px;color:var(--mut);margin-top:12px}
+.ph{font-size:15px;margin:22px 0 10px;color:var(--acc)}
+</style>
+</head>
+<body>
+<header>
+<h1>Blue Ocean Services v. Nautilus Engineering</h1>
+<p>Línea temporal interactiva · pulsa un evento para ver el detalle</p>
+</header>
+<nav>
+<div class="tabs" id="tabs"></div>
+<div class="chips" id="chips"></div>
+</nav>
+<main id="main"></main>
+<script>
+const TAGS={h:["Hecho","--c1"],k:["Contrato","--c4"],d:["Disputa","--c3"],a:["Arbitraje","--c2"]};
+const PH=["1 · Contexto (1966–2020)","2 · Desvío de fondos (2021–ene 2024)","3 · Nuevo contrato y entrega (2024–2025)","4 · Pruebas y disputa (2025–2026)","5 · Arbitraje (jun–ago 2026)","Personas","Cuestiones"];
+const E=[
+[0,"1966","h","BOS se funda","Se funda Blue Ocean Services plc."],
+[0,"2013","h","Licencia de ORI en Pelagos","El Oceanographic Research Institute (Univ. de Equatoriana) obtiene licencia para explorar la Zona Pelagos (nódulos polimetálicos, PMN)."],
+[0,"1 ene 2014","h","Wegener, CTO de BOS","Alfred Wegener es nombrado Chief Technical Officer."],
+[0,"2015","h","Nueva línea de negocio","BOS ofrece servicios de exploración mineral en aguas profundas."],
+[0,"2019","h","Nace NE; Piccard CEO","ORI crea la start-up Nautilus Engineering Ltd (NE). Auguste Piccard pasa a ser CEO de BOS. Enero: el prototipo Nautilus I supera las pruebas (chorro hidráulico, hasta 5.500 m, 85 t/h). 2 dic: DSM obtiene su licencia en Ruritania."],
+[0,"15 jun 2020","k","Contrato BOS–DSM","Tras la petición de DSM (mayo 2020), BOS firma un contrato de servicios con Deep Sea Mining para explorar PMN en Pelagos."],
+[0,"dic 2020","h","Nautilus II","Versión mejorada con la misma tecnología hidráulica; supera sus pruebas."],
+[1,"4 feb 2021","k","Contrato de compraventa BOS–NE (C2)","Compra del colector Nautilus II por USD 75 M. Entrega prevista: febrero 2025. Contiene cláusula arbitral."],
+[1,"4 mar 2021","k","Anticipo de USD 25 M","Plazo para que BOS pague el anticipo para financiar la construcción de Nautilus II."],
+[1,"2021–2023","d","Desvío de fondos","NE usa parte del anticipo para desarrollar Nautilus III, destinado a otro cliente: Responsible Engineering."],
+[1,"2023","h","Hechos en 2023","Nemo Holdings adquiere Oceanographic Data (OD). Benthic Data denuncia intentos de acceso no autorizado a sus sistemas."],
+[1,"nov 2023","h","Insolvencia de Responsible Engineering","Responsible Engineering se declara insolvente."],
+[1,"22 dic 2023","h","Se cancela el contrato de Nautilus III","NE queda en una situación financiera muy grave."],
+[1,"23 ene 2024","d","Revelación del desvío","La CEO de NE, Dra. Ellen B. Scripps, llama a Piccard: el anticipo financió Nautilus III. Propone sustituir Nautilus II por Nautilus III."],
+[2,"7 feb 2024","h","Reunión y demostración","BOS y NE se reúnen para demostrar las capacidades de Nautilus III y discutir la sustitución."],
+[2,"26 feb 2024","k","Settlement and Sales Agreement (C4)","a) Nautilus III sustituye a Nautilus II; precio USD 100 M, computando los 25 M ya anticipados.\nb) NE entregará un modelo de simulación y datos de entrada de Oceanographic Data: USD 13 M (10 M datos + 3 M modelo) más licencia anual de USD 200.000.\nc) Nautilus III usa chorro de doble fila; los datos alimentan un software de dirección adaptativa (velocidad, presión y altura) para reducir la pluma de sedimentos.\nd) Renuncia a reclamaciones previas."],
+[2,"feb 2025","h","Vence la entrega original","Expira el plazo original de entrega de Nautilus II."],
+[2,"inicios 2025","h","Dudas sobre propiedad intelectual","Preocupaciones sobre la protección de los datos bentónicos de Benthic Data."],
+[2,"2 may 2025","k","Entrega de Nautilus III","Nautilus III se entrega formalmente a BOS."],
+[3,"7 jun – 8 jul 2025","h","Pruebas en el mar","Éxito: tasa de recolección satisfactoria y cumple los nuevos estándares ambientales mínimos de Ruritania. Fallo: no se logra la reducción adicional del 15% de la pluma; la programación especial no mejora a la estándar."],
+[3,"10 sep 2025","d","Queja de Piccard","Piccard escribe a Scripps: no se han alcanzado los objetivos ambientales pactados."],
+[3,"25 sep 2025","d","Ataque informático asistido por IA","Intento de hackeo contra la base de datos de Benthic Data; el CEO de Oceanographic Data admite después su implicación."],
+[3,"26 sep 2025","h","Artículo en The Current (C1)","La revista publica un artículo sobre la minería submarina y el proyecto."],
+[3,"2 feb 2026","d","Scripps atribuye el fallo a los datos","Correo (8:25 h) a Wegener y Piccard: el fallo se debió a datos de entrada inexactos de Oceanographic Data."],
+[3,"4 feb 2026","d","Reunión BOS–NE","Wegener rechaza que los datos fueran un contrato separado fuera del ámbito de la CISG."],
+[3,"5 may 2026","d","Reunión Piccard–Scripps","Intento de acuerdo amistoso; sin resultado."],
+[4,"26 jun 2026","a","Declaración de Wegener","Declaración formal como testigo."],
+[4,"30 jun 2026","a","Declaración de Piccard (C3)","Declaración formal como testigo."],
+[4,"10 jul 2026","a","Notice of Arbitration","Joseph Langweiler (BOS) presenta la solicitud de arbitraje ante el ICDR."],
+[4,"15 jul 2026","a","Primer contacto del ICDR","El ICDR contacta oficialmente con las partes."],
+[4,"22 jul 2026","a","Conferencia organizativa","9:00 h (hora danubiana), ICDR y partes."],
+[4,"29 jul 2026","a","Objeción de competencia","Julia Clara Fasttrack (NE) sostiene que el acuerdo de 2024 remite las disputas a los tribunales ordinarios."],
+[4,"5 ago 2026","a","Respuesta de BOS","Langweiler mantiene que la cláusula arbitral sigue vigente y que la demanda cumple los requisitos."],
+[4,"11 ago 2026","a","Decisión del ICDR","Adriana Vaamonde (Directora de ADR Services) decide que el arbitraje continúe."],
+[4,"13 ago 2026","a","Árbitro de NE","Fasttrack nombra a Arvid Baird como árbitro de NE."]
+];
+const P=[
+["Auguste Piccard","CEO de BOS desde 2019. Negocia con NE, recibe la revelación del desvío, firma el acuerdo de 2024, envía la queja de sep 2025; testigo (C3)."],
+["Dra. Ellen B. Scripps","CEO de NE. Revela el uso del anticipo, propone Nautilus III, renegocia y atribuye el fallo a los datos de OD."],
+["Alfred Wegener","CTO de BOS desde 2014. Evalúa el rendimiento técnico/ambiental de Nautilus III; rechaza la tesis del contrato separado; testigo."],
+["Joseph Langweiler","Abogado de BOS (demandante). Presenta la Notice of Arbitration y defiende la cláusula arbitral."],
+["Julia Clara Fasttrack","Abogada de NE (demandada). Impugna la competencia y nombra árbitro. (Una fuente dice «Fastback»: verifica la grafía.)"],
+["Adriana Vaamonde","Directora de ADR Services del ICDR. Decide el 11 ago 2026 que el arbitraje continúe."],
+["Luis Martínez","Vicepresidente del ICDR."],
+["Arvid Baird","Árbitro nombrado por NE el 13 ago 2026."]
+];
+const I=[
+"<b>Responsabilidad contractual:</b> uso del anticipo para Nautilus III en vez de Nautilus II.",
+"<b>Modificación y renuncia:</b> efecto del acuerdo de 2024 (sustitución, precio, renuncia a reclamaciones).",
+"<b>Ámbito de la CISG:</b> ¿datos y modelo forman parte de la venta o son un contrato separado?",
+"<b>Rendimiento ambiental:</b> no se logra el 15% extra pese a cumplir los mínimos de Ruritania.",
+"<b>Datos y causalidad:</b> datos inexactos de Oceanographic Data y fallo del software adaptativo.",
+"<b>Art. 42 CISG:</b> derechos de terceros / propiedad intelectual sobre los datos.",
+"<b>Competencia arbitral:</b> ¿sigue vigente la cláusula de 2021 tras el acuerdo de 2024?",
+"<b>Procedimiento:</b> objeción de NE y decisión del ICDR de continuar."
+];
+let cur=0;const off=new Set();
+const TABS=["Línea temporal","Personas","Cuestiones"];
+const $=id=>document.getElementById(id);
+$("tabs").innerHTML=TABS.map((p,i)=>`<button class="tab" data-i="${i}">${p}</button>`).join("");
+$("chips").innerHTML=Object.entries(TAGS).map(([k,v])=>`<button class="chip" data-k="${k}"><i style="background:var(${v[1]})"></i>${v[0]}</button>`).join("");
+function esc(s){return s.replace(/&/g,"&amp;").replace(/</g,"&lt;")}
+function render(){
+document.querySelectorAll(".tab").forEach(b=>b.classList.toggle("on",+b.dataset.i===cur));
+document.querySelectorAll(".chip").forEach(b=>b.classList.toggle("off",off.has(b.dataset.k)));
+$("chips").style.display=cur===0?"flex":"none";
+let h="";
+if(cur===0){
+h='<p class="hint">Pulsa un evento para desplegarlo. Usa los filtros de color para ocultar tipos.</p><div class="tl">';
+PH.slice(0,5).forEach((nombre,f)=>{
+const ev=E.filter(e=>e[0]===f&&!off.has(e[2]));
+if(!ev.length)return;
+h+=`<h2 class="ph">${nombre}</h2>`+ev.map(e=>`<div class="ev" style="--c:var(${TAGS[e[2]][1]})"><div class="d">${e[1]} · ${TAGS[e[2]][0]}</div><div class="t">${e[3]}</div><div class="x">${esc(e[4]).replace(/\n/g,"<br>")}</div></div>`).join("");
+});
+h+="</div>";
+}else if(cur===1){
+h=P.map(p=>`<div class="pc"><b>${p[0]}</b><span>${p[1]}</span></div>`).join("");
+}else{
+h='<ol class="is">'+I.map(i=>`<li>${i}</li>`).join("")+'</ol><p class="note">Son cuestiones identificadas en los apuntes, no conclusiones sobre el fondo.</p>';
+}
+$("main").innerHTML=h;
+}
+document.addEventListener("click",e=>{
+const t=e.target.closest(".tab"),c=e.target.closest(".chip"),v=e.target.closest(".ev");
+if(t){cur=+t.dataset.i;render();scrollTo(0,0)}
+else if(c){off.has(c.dataset.k)?off.delete(c.dataset.k):off.add(c.dataset.k);render()}
+else if(v)v.classList.toggle("open");
+});
+render();
+</script>
+</body>
+</html>
